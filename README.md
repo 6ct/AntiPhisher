@@ -23,3 +23,7 @@ This bot was originally created for a Discord server with over 10k members. I wa
 ## Setup and other information.
 
 Refer to the [wiki](https://github.com/6ct/AntiPhisher/wiki).
+
+## License
+
+Anti-Phisher's source code is licensed under the [BSD-3 clause](/LICENSE).

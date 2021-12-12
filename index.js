@@ -1,6 +1,6 @@
 'use strict';
 
-var token = require('./token.json'),
+var Commands = require('./Commands'),
 	{ Client, Intents, Collection } = require('discord.js'),
 	sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
 	client = new Client({
@@ -57,10 +57,37 @@ client.on('messageCreate', async message => {
 		}
 	}
 });
+
 client.once('ready', async () => {
+	await client.user.setPresence({
+		activities: [{
+			type: 'WATCHING',
+			name: 'for Phishing | ap!help',
+		}],
+		status: 'online',
+	});
 	console.log(`Invite is https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=134343746`);
 });
 
-client.login(token);
+var commands = new Commands(client);
 
-module.exports = client;
+commands.add('ap!help', 'Displays help.', message => {
+	var result = '';
+	
+	for(let command of commands.list){
+		result += '\n';
+		
+		let perm = command.perm || 'everyone';
+		
+		result += perm[0].toUpperCase() + perm.substr(1);
+		result += ' : ';
+		result += command.alias.join(', ');
+		result += ' : ' + command.description;
+	}
+	
+	message.channel.send('```' + result + '```');
+});
+
+commands.listen();
+
+client.login(require('./token.json'));

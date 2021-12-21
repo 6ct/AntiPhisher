@@ -85,7 +85,7 @@ commands.add('ap!help', 'Displays help.', message => {
 		result += ' : ' + command.description;
 	}
 	
-	message.channel.send('```' + result + '```');
+	message.channel.send('<https://github.com/6ct/AntiPhisher/wiki>\n```' + result + '```');
 });
 
 commands.listen();

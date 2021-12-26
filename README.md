@@ -10,6 +10,8 @@ A Discord moderation bot to filter phishing links from compromised accounts.
 
 ## Usage
 
+### Messages from users with a role higher than the bot wont be filtered. Order your roles appropriately.
+
 | Command   | Description                          |
 | --------- | ------------------------------------ |
 | `ap!help` | Displays a list of commands in chat. |

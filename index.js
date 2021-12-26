@@ -15,7 +15,7 @@ var Commands = require('./Commands'),
 	filters = [
 		{
 			label: 'Steam Phishing Link',
-			regex: /fuck this \w+ called (CS:GO|csgo)|stearncommunity\.|steamcommuninty\.|choose a skin and posion the trade/i,
+			regex: /I am giving away all my inventory|fuck this \w+ called (CS:GO|csgo)|stearncommunity\.|steamcommuninty\.|choose a skin and posion the trade/i,
 		},
 		{
 			label: 'Nitro/Steam Phishing Link',

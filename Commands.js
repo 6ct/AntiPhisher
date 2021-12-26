@@ -1,9 +1,9 @@
 'use strict';
 
-var { FLAGS: pmf } = require('discord.js/src/util/Permissions.js'),
+var { Permissions } = require('discord.js'),
 	overload = require('./overload'),
 	o = overload.o,
-	admin_bits = pmf.ADMINISTRATOR | pmf.MANAGE_GUILD | pmf.KICK_MEMBERS | pmf.BAN_MEMBERS;
+	admin_bits = Permissions.FLAGS.ADMINISTRATOR | Permissions.FLAGS.MANAGE_GUILD | Permissions.FLAGS.KICK_MEMBERS | Permissions.FLAGS.BAN_MEMBERS;
 
 overload.define('cooldown', arg => {
 	return typeof arg == 'number' || arg == undefined;
@@ -61,7 +61,7 @@ class Commands {
 		if(message.member == void[] || message.author.bot)return;
 		
 		var args = message.content.trim().replace(/\s+/g, ' ').split(' '),
-			bitfield = message.member?.permissions.bitfield,
+			bitfield = message.member?.permissions.bitfield || 0,
 			cperms = {
 				member: true,
 				owner: message.member == await message.guild.fetchOwner(),
@@ -72,7 +72,7 @@ class Commands {
 			roles?.some(role => member.roles.cache.has(role));
 		
 		if(cperms.owner)cperms.admin = true;
-		if(cperms.admin || (bitfield | admin_bits) == bitfield)cperms.mod = true;
+		if(cperms.admin || bitfield & admin_bits)cperms.mod = true;
 		if(cperms.mod)cperms.helper = true;
 		if(cperms.helper)cperms.staff = true;
 		

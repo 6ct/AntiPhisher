@@ -1,7 +1,8 @@
 'use strict';
 
 var Commands = require('./Commands'),
-	{ Client, Intents, Collection } = require('discord.js'),
+	{ Client, Intents, Collection, Constants, Permissions } = require('discord.js'),
+	bot_permissions = Permissions.FLAGS.MODERATE_MEMBERS | Permissions.FLAGS.MANAGE_MESSAGES | Permissions.FLAGS.SEND_MESSAGES | Permissions.FLAGS.VIEW_CHANNEL | Permissions.FLAGS.EMBED_LINKS | Permissions.FLAGS.MANAGE_THREADS | Permissions.FLAGS.VIEW_CHANNEL,
 	sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
 	client = new Client({
 		intents: [
@@ -43,14 +44,29 @@ Collection.prototype[Symbol.iterator] = Collection.prototype.entries;
 client.on('messageCreate', async message => {
 	if(message.channel.type == 'dm' || message.author.bot)return;
 	
-	for(let { label, regex, test, explain } of filters){
+	var higher_role = message.guild.me.roles.highest.position > message.member.roles.highest.position;
+	
+	if(higher_role)for(let { label, regex, test, explain } of filters){
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){
-			await message.delete();
+			try{
+				await message.delete();
+			}catch(err){
+				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
+					message.channel.send(`I'm missing permission to delete this message!`);
+				}else console.error(err);
+			}
 			
 			let response = await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			
+			try{
+				await message.member.timeout(60e3, `User's message was flagged as ${label}.`)
+			}catch(err){
+				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
+					message.channel.send(`I'm missing permission to timeout!`);
+				}else console.error(err);
+			}
 			await sleep(7.5e3);
 			
 			await response.delete();
@@ -66,7 +82,7 @@ client.once('ready', async () => {
 		}],
 		status: 'online',
 	});
-	console.log(`Invite is https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=134343746`);
+	console.log(`Invite is https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=${bot_permissions}`);
 });
 
 var commands = new Commands(client);

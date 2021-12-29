@@ -64,7 +64,7 @@ client.on('messageCreate', async message => {
 			let response = await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			
 			try{
-				// await message.member.timeout(60e3 * 2, `User's message was flagged as ${label}.`)
+				await message.member.timeout(60e3 * 2, `User's message was flagged as ${label}.`)
 			}catch(err){
 				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
 					message.channel.send(`I'm missing permission to timeout!`);

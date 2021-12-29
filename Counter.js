@@ -8,7 +8,7 @@ class Counter {
 	}
 	data = {};
 	async create(file){
-		this.file = await fs.promises.open(file, 'r+');
+		this.file = await fs.promises.open(file, 'w');
 		
 		var { size } = await this.file.stat();
 		

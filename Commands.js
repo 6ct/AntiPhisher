@@ -3,6 +3,7 @@
 var { Permissions } = require('discord.js'),
 	overload = require('./overload'),
 	o = overload.o,
+	AsyncFunction = (async _=>_).constructor,
 	admin_bits = Permissions.FLAGS.ADMINISTRATOR | Permissions.FLAGS.MANAGE_GUILD | Permissions.FLAGS.KICK_MEMBERS | Permissions.FLAGS.BAN_MEMBERS;
 
 overload.define('cooldown', arg => {
@@ -28,7 +29,7 @@ class Command {
 			this.description = this.#description(description);
 			if(!isNaN(cooldown))this.cooldown = cooldown;
 		})
-		.args(o.any(String, Array), String, Function, o.cooldown)
+		.args(o.any(String, Array), String, o.any(AsyncFunction, Function), o.cooldown)
 		.use(function(alias, description, callback, cooldown){
 			this.alias.push(...[].concat(alias));
 			this.callback = callback;

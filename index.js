@@ -1,8 +1,22 @@
 'use strict';
 
+{
+	let { ANY, ALL } = require('./StringFilter');
+	
+	var filter = new ANY(
+		new ALL('nitro', '@everyone'),
+		new ALL(new ANY('discord', 'nitro'), 'airdrop'),
+		new ALL('nitro', new ANY('free', 'take', 'gen', 'steam')),
+		new ALL('gifts for ', 'nitro for 3 months'),
+		new ALL('free', 'distributi\u03bfn'),
+	);
+}
 var Commands = require('./Commands'),
+	Counter = require('./Counter'),
 	{ Client, Intents, Collection, Constants, Permissions } = require('discord.js'),
 	bot_permissions = Permissions.FLAGS.MODERATE_MEMBERS | Permissions.FLAGS.MANAGE_MESSAGES | Permissions.FLAGS.SEND_MESSAGES | Permissions.FLAGS.VIEW_CHANNEL | Permissions.FLAGS.EMBED_LINKS | Permissions.FLAGS.MANAGE_THREADS | Permissions.FLAGS.VIEW_CHANNEL,
+	path = require('path'),
+	count = new Counter(path.join(__dirname, './Count.json')),
 	sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
 	client = new Client({
 		intents: [
@@ -21,20 +35,7 @@ var Commands = require('./Commands'),
 		{
 			label: 'Nitro/Steam Phishing Link',
 			test(content){
-				content = content.toLowerCase();
-				
-				var has_nitro = content.includes('nitro');
-				
-				if
-					 ( has_nitro && content.includes('@everyone')
-					|| (content.includes('discord') || has_nitro) && content.includes('airdrop')
-					|| has_nitro && content.includes('free')
-					|| has_nitro && content.includes('take')
-					|| has_nitro && content.includes('gen')
-					|| has_nitro && content.includes('steam')
-					|| content.includes('free') && content.includes('distributiοn')
-				)return true;
-				else return false;
+				return filter.test(content.toLowerCase());
 			},
 		},
 	];
@@ -58,15 +59,18 @@ client.on('messageCreate', async message => {
 				}else console.error(err);
 			}
 			
+			count.add(label);
+			
 			let response = await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			
 			try{
-				await message.member.timeout(60e3, `User's message was flagged as ${label}.`)
+				// await message.member.timeout(60e3 * 2, `User's message was flagged as ${label}.`)
 			}catch(err){
 				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
 					message.channel.send(`I'm missing permission to timeout!`);
 				}else console.error(err);
 			}
+			
 			await sleep(7.5e3);
 			
 			await response.delete();
@@ -78,14 +82,26 @@ client.once('ready', async () => {
 	await client.user.setPresence({
 		activities: [{
 			type: 'WATCHING',
-			name: 'for Phishing | ap!help',
+			name: `for Phishing | ap!help`,
 		}],
 		status: 'online',
 	});
+	
 	console.log(`Invite is https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=${bot_permissions}`);
 });
 
 var commands = new Commands(client);
+
+commands.add('ap!stats', 'Displays global statistics for phishing messages filtered.', async message => {
+	var result = 'Global statistics:\n';
+	
+	for(let { label } of filters){
+		let a = await count.get(label);
+		result += `${wt(label)}: **${a}**\n`;
+	}
+	
+	message.channel.send(result);
+});
 
 commands.add('ap!help', 'Displays help.', message => {
 	var result = '';

@@ -17,6 +17,7 @@ var sNull      = 'Null',
 	sRegExp    = 'RegExp',
 	sBoolean   = 'Boolean',
 	sFunction  = 'Function',
+	sAsyncFunction = 'AsyncFunction',
 	sElement   = 'Element';
 
 // Utilizing the non-standard (but available in modern browsers) Global Object names
@@ -32,6 +33,7 @@ var sNull      = 'Null',
 			sRegExp,
 			sBoolean,
 			sFunction,
+			sAsyncFunction,
 			sElement
 		],
 		idx = globalObjects.length,
@@ -63,7 +65,8 @@ _types[sArray]     = 8;
 _types[sRegExp]    = 9;
 _types[sBoolean]   = 10;
 _types[sFunction]  = 11;
-_types[sElement]   = 12;
+_types[sAsyncFunction]  = 12;
+_types[sElement]   = 13;
 
 /**
  * Cached reference to Object.prototype.toString
@@ -95,7 +98,8 @@ var _toString = (function(toString) {
 				[ sObject,   _types[sObject]   ],
 				[ sArray,    _types[sArray]    ],
 				[ sRegExp,   _types[sRegExp]   ],
-				[ sFunction, _types[sFunction] ]
+				[ sFunction, _types[sFunction] ],
+				[ sAsyncFunction, _types[sAsyncFunction] ]
 			],
 			idx = types.length;
 		while (idx--) {

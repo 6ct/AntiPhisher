@@ -11,6 +11,7 @@
 		new ALL('free', 'distributi\u03bfn'),
 	);
 }
+
 var Commands = require('./Commands'),
 	Counter = require('./Counter'),
 	{ Client, Intents, Collection, Constants, Permissions } = require('discord.js'),

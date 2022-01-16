@@ -1,14 +1,18 @@
 'use strict';
 
 {
-	let { ANY, ALL } = require('./StringFilter');
+	let { ANY, ALL, NOT } = require('./StringFilter');
 	
-	var filter = new ANY(
-		new ALL('nitro', '@everyone'),
-		new ALL(new ANY('discord', 'nitro'), 'airdrop'),
-		new ALL('nitro', new ANY('free', 'take', 'gen', 'steam')),
-		new ALL('gifts for ', 'nitro for 3 months'),
-		new ALL('free', 'distributi\u03bfn'),
+	var filter = new ALL(
+		new NOT('discord.gift/'),
+		new ANY(
+			new ALL('nitro', '@everyone'),
+			new ALL(new ANY('discord', 'nitro'), 'airdrop'),
+			new ALL('nitro', new ANY('free', 'take', 'gen', 'steam')),
+			new ALL('gifts for ', 'nitro for 3 months'),
+			new ALL('free', 'distributi\u03bfn'),
+			new ALL('@everyone', 'who will catch this gift?'),
+		),
 	);
 }
 

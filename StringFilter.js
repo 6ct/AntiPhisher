@@ -16,6 +16,17 @@ class WORD {
 	}
 };
 
+class NOT {
+	constructor(...filters){
+		WORD.process(filters);
+		this.filters = filters;
+	}
+	test(string){
+		for(let filter of this.filters)if(filter.test(string))return false;
+		return true;
+	}
+};
+
 class ANY {
 	constructor(...filters){
 		WORD.process(filters);
@@ -38,6 +49,7 @@ class ALL {
 	}
 };
 
+exports.NOT = NOT;
 exports.ALL = ALL;
 exports.ANY = ANY;
 exports.WORD = WORD;

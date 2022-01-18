@@ -12,6 +12,7 @@
 			new ALL('gifts for ', 'nitro for 3 months'),
 			new ALL('free', 'distributi\u03bfn'),
 			new ALL('@everyone', 'who will catch this gift?'),
+			new ALL('@everyone', 'who is first', '.gift/'), // not discord.gift, main NOT clears this outerHTML
 		),
 	);
 }
@@ -46,42 +47,6 @@ var Commands = require('./Commands'),
 	];
 
 Collection.prototype[Symbol.iterator] = Collection.prototype.entries;
-
-client.on('messageCreate', async message => {
-	if(message.channel.type == 'dm' || message.author.bot)return;
-	
-	var higher_role = message.guild.me.roles.highest.position > message.member.roles.highest.position;
-	
-	if(higher_role)for(let { label, regex, test, explain } of filters){
-		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
-		
-		if(matches){
-			try{
-				await message.delete();
-			}catch(err){
-				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
-					message.channel.send(`I'm missing permission to delete this message!`);
-				}else console.error(err);
-			}
-			
-			count.add(label);
-			
-			let response = await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
-			
-			try{
-				await message.member.timeout(60e3 * 2, `User's message was flagged as ${label}.`)
-			}catch(err){
-				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
-					message.channel.send(`I'm missing permission to timeout!`);
-				}else console.error(err);
-			}
-			
-			await sleep(7.5e3);
-			
-			await response.delete();
-		}
-	}
-});
 
 client.once('ready', async () => {
 	await client.user.setPresence({
@@ -125,6 +90,58 @@ commands.add('ap!help', 'Displays help.', message => {
 	message.channel.send('<https://github.com/6ct/AntiPhisher/wiki>\n```' + result + '```');
 });
 
+commands.add('ap!test', 'Tests the filter.', async message => {
+	message.test_ph = true;
+	await message.delete();
+	
+	for(let { label, regex, test, explain } of filters){
+		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
+		
+		if(matches){
+			return await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
+		}
+	}
+	
+	message.channel.send('Your message was not filtered.');
+});
+
 commands.listen();
 
 client.login(require('./token.json'));
+
+
+client.on('messageCreate', async message => {
+	if(message.channel.type == 'dm' || message.author.bot)return;
+	
+	var higher_role = message.guild.me.roles.highest.position > message.member.roles.highest.position;
+	
+	if(higher_role && !message.test_ph)for(let { label, regex, test, explain } of filters){
+		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
+		
+		if(matches){
+			try{
+				await message.delete();
+			}catch(err){
+				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
+					message.channel.send(`I'm missing permission to delete this message!`);
+				}else console.error(err);
+			}
+			
+			count.add(label);
+			
+			let response = await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
+			
+			try{
+				await message.member.timeout(60e3 * 2, `User's message was flagged as ${label}.`)
+			}catch(err){
+				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
+					message.channel.send(`I'm missing permission to timeout!`);
+				}else console.error(err);
+			}
+			
+			await sleep(7.5e3);
+			
+			await response.delete();
+		}
+	}
+});

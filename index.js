@@ -91,7 +91,9 @@ commands.add('ap!help', 'Displays help.', message => {
 	message.channel.send('<https://github.com/6ct/AntiPhisher/wiki>\n```' + result + '```');
 });
 
-var ap_test = async message => {
+commands.add('ap!test', 'Tests the filter.', async message => {
+	message.test_ph = true;
+	
 	for(let { label, regex, test, explain } of filters){
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
@@ -103,19 +105,17 @@ var ap_test = async message => {
 	}
 
 	message.channel.send('Your message was not filtered.');
-};
-
-commands.add('ap!test', 'Tests the filter.', message => {
-	message.test_ph = true;
-	ap_test(message);
 });
 
 commands.listen();
 
 client.login(require('./token.json'));
 
-var filter_message = async message => {
-	if(message.channel.type == 'dm' || message.author.bot)return;
+client.on('messageCreate', async message => {
+	// wait for async stack to clear
+	await{};
+	
+	if(message.test_ph || message.channel.type == 'dm' || message.author.bot)return;
 	
 	var higher_role = message.guild.me.roles.highest.position > message.member.roles.highest.position;
 	
@@ -148,10 +148,4 @@ var filter_message = async message => {
 			await response.delete();
 		}
 	}
-};
-
-client.on('messageCreate', message => {
-	if(message.test_ph)return;
-	
-	filter_message(message);
 });

@@ -91,14 +91,14 @@ commands.add('ap!help', 'Displays help.', message => {
 	message.channel.send('<https://github.com/6ct/AntiPhisher/wiki>\n```' + result + '```');
 });
 
-commands.add('ap!test', 'Tests the filter.', async message => {
+commands.add('ap!test', 'Tests the filter.', message => {
 	message.test_ph = true;
 	
 	for(let { label, regex, test, explain } of filters){
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){
-			await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
+			message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			return;
 		}
 	}
@@ -110,13 +110,14 @@ commands.listen();
 
 client.login(require('./token.json'));
 
-
 client.on('messageCreate', async message => {
+	if(message.test_ph)return;
+	
 	if(message.channel.type == 'dm' || message.author.bot)return;
 	
 	var higher_role = message.guild.me.roles.highest.position > message.member.roles.highest.position;
 	
-	if(higher_role && !message.test_ph)for(let { label, regex, test, explain } of filters){
+	if(higher_role)for(let { label, regex, test, explain } of filters){
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){

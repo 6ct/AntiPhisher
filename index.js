@@ -98,6 +98,7 @@ commands.add('ap!test', 'Tests the filter.', message => {
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){
+			message.delete();
 			message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			return;
 		}

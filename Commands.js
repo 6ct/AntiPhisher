@@ -58,7 +58,7 @@ class Commands {
 	} ]
 	*/
 	permissions = new Map();
-	async on_message(message){
+	on_message(message){
 		if(message.member == void[] || message.author.bot)return;
 		
 		var args = message.content.trim().replace(/\s+/g, ' ').split(' '),

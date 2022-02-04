@@ -1,7 +1,7 @@
 'use strict';
 
 var { Permissions } = require('discord.js'),
-	overload = require('./overload'),
+	overload = require('./Overload'),
 	o = overload.o,
 	AsyncFunction = (async _=>_).constructor,
 	admin_bits = Permissions.FLAGS.ADMINISTRATOR | Permissions.FLAGS.MANAGE_GUILD | Permissions.FLAGS.KICK_MEMBERS | Permissions.FLAGS.BAN_MEMBERS;

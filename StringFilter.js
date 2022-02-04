@@ -8,11 +8,21 @@ class WORD {
 			}
 		}
 	}
-	constructor(word){
-		this.word = word;
+	constructor(word, case_insensitive = true){
+		if(case_insensitive === true){
+			this.word = word.toLowerCase();
+			this.case_insensitive = true;
+		}else{
+			this.word = word;
+			this.case_insensitive = false;
+		}
 	}
 	test(string){
-		return string.includes(this.word);
+		if(this.case_insensitive){
+			return string.toLowerCase().includes(this.word);
+		}else{
+			return string.includes(this.word);
+		}
 	}
 };
 

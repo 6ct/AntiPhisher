@@ -6,6 +6,7 @@
 	var filter = new ALL(
 		new NOT('discord.gift/'),
 		new ANY(
+			new ALL('.gift/', 'Whо is first?'),
 			new ALL('nitro', '@everyone'),
 			new ALL(new ANY('discord', 'nitro'), 'airdrop'),
 			new ALL('nitro', new ANY('free', 'take', 'gen', 'steam')),
@@ -92,13 +93,13 @@ commands.add('ap!help', 'Displays help.', message => {
 
 commands.add('ap!test', 'Tests the filter.', async message => {
 	message.test_ph = true;
-	await message.delete();
 	
 	for(let { label, regex, test, explain } of filters){
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){
-			return await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
+			await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
+			return;
 		}
 	}
 	

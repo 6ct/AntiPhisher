@@ -98,7 +98,14 @@ commands.add('ap!test', 'Tests the filter.', async message => {
 		let matches = typeof test == 'function' ? test(message.content) : message.content.match(regex);
 		
 		if(matches){
-			await message.delete();
+			try{
+				await message.delete();
+			}catch(err){
+				if(err.code == Constants.APIErrors.MISSING_PERMISSIONS){
+					message.channel.send(`I'm missing permission to delete this message!`);
+				}else console.error(err);
+			}
+			
 			await message.channel.send(`${message.member} Your message was flagged as ${wt(label)}` + (typeof explain == 'function' ? ` because: ${wt(explain(message, matches))}` : ''));
 			return;
 		}

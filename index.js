@@ -7,6 +7,7 @@
 		new NOT('discord.gift/'),
 		new ANY(
 			new ALL('.gift/', 'Whо is first?'),
+			new ALL('.gift/', 'take it'),
 			new ALL('nitro', '@everyone'),
 			new ALL(new ANY('discord', 'nitro'), 'airdrop'),
 			new ALL('nitro', new ANY('free', 'take', 'gen', 'steam')),
